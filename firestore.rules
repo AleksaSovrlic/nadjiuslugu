@@ -1,1 +1,16 @@
-rules_version = '2';\nservice cloud.firestore {\n  match /databases/{database}/documents {\n    match /{document=**} {\n      allow read, write: if true;\n    }\n  }\n}
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{db}/documents {
+    // Svako može da čita spisak majstora
+    match /businesses/{uid} {
+      allow read: if true;
+      // Pisati može samo ulogovani majstor za svoje podatke
+      allow write: if request.auth != null && request.auth.uid == uid;
+    }
+    // Upiti od građana
+    match /leads/{id} {
+      allow create: if true; // građanin sme da pošalje upit
+      allow read, update, delete: if request.auth != null; // majstor vidi svoje leadove
+    }
+  }
+}

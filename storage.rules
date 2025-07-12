@@ -1,1 +1,13 @@
-rules_version = '2';\nservice firebase.storage {\n  match /b/{bucket}/o {\n    match /{allPaths=**} {\n      allow read, write: if true;\n    }\n  }\n}
+rules_version = '2';
+service firebase.storage {
+  match /b/{bucket}/o {
+    // SVI MOGU da čitaju (slike profila, galeriju)
+    match /{allPaths=**} {
+      allow read: if true;
+
+      /* Pisanje (upload, update, delete) dozvoljavamo
+         SAMO ako je korisnik prijavljen */
+      allow write: if request.auth != null;
+    }
+  }
+}
